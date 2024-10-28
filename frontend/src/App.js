@@ -1,63 +1,26 @@
-import Signup from './components/Signup';
-import './App.css';
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import HomePage from './components/HomePage';
-import Login from './components/Login';
-import { useEffect, useState } from 'react';
-import {useSelector,useDispatch} from "react-redux";
-import io from "socket.io-client";
-import { setSocket } from './redux/socketSlice';
-import { setOnlineUsers } from './redux/userSlice';
-import { BASE_URL } from '.';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import LandingPage from './pages/LandingPage';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
+import Signup from './components/Signup.jsx';
+import Login from './components/Login.jsx'; 
 
-const router = createBrowserRouter([
-  {
-    path:"/",
-    element:<HomePage/>
-  },
-  {
-    path:"/signup",
-    element:<Signup/>
-  },
-  {
-    path:"/login",
-    element:<Login/>
-  },
-
-])
-
-function App() { 
-  const {authUser} = useSelector(store=>store.user);
-  const {socket} = useSelector(store=>store.socket);
-  const dispatch = useDispatch();
-
-  useEffect(()=>{
-    if(authUser){
-      const socketio = io(`${BASE_URL}`, {
-          query:{
-            userId:authUser._id
-          }
-      });
-      dispatch(setSocket(socketio));
-
-      socketio?.on('getOnlineUsers', (onlineUsers)=>{
-        dispatch(setOnlineUsers(onlineUsers))
-      });
-      return () => socketio.close();
-    }else{
-      if(socket){
-        socket.close();
-        dispatch(setSocket(null));
-      }
-    }
-
-  },[authUser]);
-
+function App() {
   return (
-    <div className="p-4 h-screen flex items-center justify-center">
-      <RouterProvider router={router}/>
-    </div>
-
+    <Router>
+      <div>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
